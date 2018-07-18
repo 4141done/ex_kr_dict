@@ -5,7 +5,7 @@ defmodule KrDict.Util.Hangul do
 
   defstruct [:onset, :vowel, :coda]
 
-  # Todo: understand this.  Likely UTF-8 beginning of all hangul
+  # This is the first hangul occurrence in utf-8: "가" (last is "뿿", 0xBFFF)
   @hangul_base 0xAC00
 
   # Todo: understand this and why the multiplication.  Likely UTF-8 beginning of onsets
