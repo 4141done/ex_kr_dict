@@ -23,13 +23,19 @@ defmodule Trie do
     GenServer.call(pid, {:prefix, binary})
   end
 
+  def barf(pid) do
+    GenServer.call(pid, :barf)
+  end
+
+  def handle_call(:barf, _from, state) do
+    {:reply, state, state}
+  end
+
   def handle_call({:find, binary}, _from, state) do
     {:reply, do_find(state, [], binary), state}
   end
 
   def handle_call({:prefix, binary}, _from, state) do
-    {:ok, found} = do_find(state, [], binary)
-    {:reply, List.to_string(found), state}
   end
 
   def handle_cast({:insert, binary}, state) do
@@ -40,36 +46,26 @@ defmodule Trie do
   # defp find_after(%{children: children} = current_node, found) do
   #   children
   #   |> Enum.map(fn (key, val) ->
-      
   #   end)
   # end
 
   defp do_find(nil, _, _), do: :not_found
   defp do_find(_current_node, found, ""), do: {:ok, List.to_string(found)}
-  defp do_find(%{children: children} = current_node, found, <<current::utf8>> <> rest) do
-    case Map.get(children, current) do
+  defp do_find(%{children: children} = current_node, found, binary) do
+    case Map.get(children, binary) do
       nil ->
-        do_find(nil, found, rest)
-      %{value: val} = next_node ->
-        IO.puts "-> #{val}"
-        do_find(next_node, found ++ [val], rest)
+        do_find(nil, found, binary)
+      %{value: val} ->
+        {:ok, val}
     end
   end
 
-
-  defp do_insert(_current_node, root, _path, ""), do: root
-
-  defp do_insert(%{children: children} = current_node, root, path, <<current::utf8>> <> rest) do
-    case Map.get(children, current) do
+  defp do_insert(%{children: children} = current_node, root, path, binary) do
+    case Map.get(children, binary) do
       nil ->
-        IO.puts("new node")
-        IO.inspect(path)
-        new_node = %{value: current, children: %{}}
-        do_insert(new_node, put_in(root, path ++ [current], new_node), path ++ [current, :children], rest)
+        put_in(root, path ++ [binary], %{value: binary, children: %{}})
       child ->
-        IO.puts("found child")
-        IO.inspect(path)
-        do_insert(child, root, path ++ [current, :children], rest)
+        do_insert(child, root, path ++ [binary, :children], binary)
     end
   end
 end
