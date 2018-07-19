@@ -46,6 +46,8 @@ defmodule TrieTest do
     assert :not_found == Trie.find(trie, "광")
   end
 
+  @tag timeout: 100_000
+  @tag :bad
   test "prefix/2 find any words that share a prefix", %{trie: trie} do
     Trie.insert(trie, "공기")
     Trie.insert(trie, "공기밥")

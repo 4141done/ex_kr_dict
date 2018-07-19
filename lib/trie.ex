@@ -1,5 +1,6 @@
 defmodule Trie do
   use GenServer
+  require IEx
 
   defstruct children: %{}, value: nil, is_word_boundary: false
 
@@ -32,7 +33,7 @@ defmodule Trie do
   end
 
   def handle_call({:prefix, binary}, _from, state) do
-    {:reply, do_find(state, [], binary), state}
+    {:reply, do_prefix_search(state, binary, binary), state}
   end
 
   def handle_cast({:insert, binary}, state) do
@@ -42,6 +43,33 @@ defmodule Trie do
 
   def handle_call(:barf, _from, state) do
     {:reply, state, state}
+  end
+
+  def gather_prefixes(%{children: children}, _current, found) when children == %{} do
+    found
+  end
+
+  def gather_prefixes(%{value: val, children: children} = current_node, current, found) do
+    children
+    |> Enum.flat_map(fn
+      {_, %{is_word_boundary: false, value: val} = next_node} ->
+        gather_prefixes(next_node, current ++ [val], found)
+      {_, %{children: next_children, value: val, is_word_boundary: true} = next_node} ->
+        word = List.to_string(current ++ [val])
+        gather_prefixes(next_node, current ++ [val], [word | found])
+    end)
+    |> Enum.sort()
+  end
+
+  defp do_prefix_search(nil, _, _), do: {:ok, []}
+
+  defp do_prefix_search(current_node, "", original) do
+    {:ok, gather_prefixes(current_node, String.split(original, ""), [])}
+  end
+
+  defp do_prefix_search(%{children: children}, <<current::utf8>> <> rest, original) do
+    Map.get(children, current)
+    |> do_prefix_search(rest, original)
   end
 
   defp do_find(%{is_word_boundary: true}, found, ""), do: {:ok, List.to_string(found)}
@@ -55,7 +83,6 @@ defmodule Trie do
       nil ->
         do_find(nil, found, rest)
       %{value: val} = next_node ->
-        IO.puts "-> #{val}"
         do_find(next_node, found ++ [val], rest)
     end
   end
@@ -65,8 +92,6 @@ defmodule Trie do
   defp do_insert(%{children: children} = current_node, root, path, <<current::utf8>> <> rest) do
     case Map.get(children, current) do
       nil ->
-        IO.puts("new node")
-        IO.inspect(path)
         new_node = %{
           value: current,
           children: %{},
@@ -74,8 +99,6 @@ defmodule Trie do
         }
         do_insert(new_node, put_in(root, path ++ [current], new_node), path ++ [current, :children], rest)
       child ->
-        IO.puts("found child")
-        IO.inspect(path)
         do_insert(child, root, path ++ [current, :children], rest)
     end
   end
