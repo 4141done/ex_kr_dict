@@ -39,8 +39,6 @@ defmodule KrDict.Util.Hangul do
 
   defguard is_valid_hangul(hangul) when hangul not in @onset_list and hangul not in @vowel_list and hangul not in @coda_list
 
-
-
   def decompose(<<hangul::utf8>> = hangul_string) when is_valid_hangul(hangul_string) do
     u = hangul - @hangul_base
 

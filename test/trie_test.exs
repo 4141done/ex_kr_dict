@@ -53,6 +53,14 @@ defmodule TrieTest do
     Trie.insert(trie, "공기밥")
     Trie.insert(trie, "공항버스")
 
-    assert {:ok, ["공기", "공기밥", "공항버스"]} = Trie.prefix(trie, "공")
+    assert {:ok, ["공", "공기", "공기밥", "공항버스"]} = Trie.prefix(trie, "공")
+  end
+
+  test "prefix/2 will return the prefix as well if it is a word", %{trie: trie} do
+    Trie.insert(trie, "공기")
+    Trie.insert(trie, "공기밥")
+    Trie.insert(trie, "공항버스")
+
+    assert {:ok, ["공기", "공기밥"]} = Trie.prefix(trie, "공기")
   end
 end

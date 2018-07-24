@@ -1,6 +1,5 @@
 defmodule Trie do
   use GenServer
-  require IEx
 
   defstruct children: %{}, value: nil, is_word_boundary: false
 
@@ -33,7 +32,7 @@ defmodule Trie do
   end
 
   def handle_call({:prefix, binary}, _from, state) do
-    {:reply, do_prefix_search(state, binary, binary), state}
+    {:reply, do_prefix_search(state, binary, []), state}
   end
 
   def handle_cast({:insert, binary}, state) do
@@ -58,18 +57,21 @@ defmodule Trie do
         word = List.to_string(current ++ [val])
         gather_prefixes(next_node, current ++ [val], [word | found])
     end)
+    |> Enum.uniq() # Hack: We get the original prefix multiple times
     |> Enum.sort()
   end
 
   defp do_prefix_search(nil, _, _), do: {:ok, []}
 
-  defp do_prefix_search(current_node, "", original) do
-    {:ok, gather_prefixes(current_node, String.split(original, ""), [])}
+  defp do_prefix_search(current_node, "", found) do
+    {:ok, gather_prefixes(current_node, found, [List.to_string(found)])}
   end
 
-  defp do_prefix_search(%{children: children}, <<current::utf8>> <> rest, original) do
-    Map.get(children, current)
-    |> do_prefix_search(rest, original)
+  defp do_prefix_search(%{children: children}, <<current::utf8>> <> rest, found) do
+    case Map.get(children, current) do
+      nil -> do_prefix_search(nil, rest, found)
+      %{value: val} = next_node -> do_prefix_search(next_node, rest, found ++ [val])
+    end
   end
 
   defp do_find(%{is_word_boundary: true}, found, ""), do: {:ok, List.to_string(found)}
