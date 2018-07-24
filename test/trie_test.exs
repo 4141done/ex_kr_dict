@@ -46,14 +46,20 @@ defmodule TrieTest do
     assert :not_found == Trie.find(trie, "광")
   end
 
-  @tag timeout: 100_000
-  @tag :bad
+  test "prefix/2 deals with empty string", %{trie: trie} do
+    Trie.insert(trie, "공기")
+    Trie.insert(trie, "공기밥")
+    Trie.insert(trie, "공항버스")
+
+    assert {:ok, []} = Trie.prefix(trie, "")
+  end
+
   test "prefix/2 find any words that share a prefix", %{trie: trie} do
     Trie.insert(trie, "공기")
     Trie.insert(trie, "공기밥")
     Trie.insert(trie, "공항버스")
 
-    assert {:ok, ["공", "공기", "공기밥", "공항버스"]} = Trie.prefix(trie, "공")
+    assert {:ok, ["공기", "공기밥", "공항버스"]} = Trie.prefix(trie, "공")
   end
 
   test "prefix/2 will return the prefix as well if it is a word", %{trie: trie} do
@@ -64,6 +70,7 @@ defmodule TrieTest do
     assert {:ok, ["공기", "공기밥"]} = Trie.prefix(trie, "공기")
   end
 
+  @tag :bad
   test "prefix/2 will not return the prefix as well if it is not a word", %{trie: trie} do
     Trie.insert(trie, "공기")
     Trie.insert(trie, "공기밥")

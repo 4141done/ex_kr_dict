@@ -14,7 +14,7 @@ defmodule KrDict.Util.Hangul do
   # Todo: understand this.  Likely UTF-8 beginning of vowels
   @vowel_base 28
 
-  # Todo: understand why we don"t care about coda base.  Can we solve some of these issue with 값attern matching?
+  # Todo: understand why we don"t care about coda base.  Can we solve some of these issue with pattern matching?
 
   # onset 감 -> ㄱ
   @onset_list [
@@ -65,7 +65,6 @@ defmodule KrDict.Util.Hangul do
   ]
 
   # coda 감 -> ㅁ
-  # todo: fix seperated coda
   @coda_list [
     " ",
     "ㄱ",
@@ -118,6 +117,7 @@ defmodule KrDict.Util.Hangul do
 
   def decompose(bad_hangul), do: {:error, "#{bad_hangul} is not valid hangul"}
 
+  # TODO
   def has_coda?(hangul) do
   end
 

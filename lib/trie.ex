@@ -1,8 +1,6 @@
 defmodule Trie do
   use GenServer
 
-  defstruct children: %{}, value: nil, is_word_boundary: false
-
   def start_link(opts \\ []) do
     GenServer.start_link(__MODULE__, :ok, opts)
   end
@@ -32,7 +30,7 @@ defmodule Trie do
   end
 
   def handle_call({:prefix, binary}, _from, state) do
-    {:reply, do_prefix_search(state, binary, []), state}
+    {:reply, do_prefix_search(state, binary, [], state), state}
   end
 
   def handle_cast({:insert, binary}, state) do
@@ -63,22 +61,29 @@ defmodule Trie do
     |> Enum.sort()
   end
 
-  defp do_prefix_search(nil, _, _), do: {:ok, []}
+  def gather_prefixes(_node, _current, found), do: []
 
-  defp do_prefix_search(current_node, "", found) do
-    {:ok, gather_prefixes(current_node, found, [List.to_string(found)])}
+  defp do_prefix_search(nil, _, _, _), do: {:ok, []}
+
+  defp do_prefix_search(current_node, "", found, root) do
+    case do_find(root, [], List.to_string(found)) do
+      :not_found ->
+        {:ok, gather_prefixes(current_node, found, [])}
+      {:ok, word} ->
+        {:ok, gather_prefixes(current_node, found, [word])}
+    end
   end
 
-  defp do_prefix_search(%{children: children}, <<current::utf8>> <> rest, found) do
+  defp do_prefix_search(%{children: children}, <<current::utf8>> <> rest, found, root) do
     case Map.get(children, current) do
-      nil -> do_prefix_search(nil, rest, found)
-      %{value: val} = next_node -> do_prefix_search(next_node, rest, found ++ [val])
+      nil -> do_prefix_search(nil, rest, found, root)
+      %{value: val} = next_node -> do_prefix_search(next_node, rest, found ++ [val], root)
     end
   end
 
   defp do_find(%{is_word_boundary: true}, found, ""), do: {:ok, List.to_string(found)}
 
-  defp do_find(%{is_word_boundary: false}, _found, ""), do: :not_found
+  defp do_find(_root, _found, ""), do: :not_found
 
   defp do_find(nil, _, _), do: :not_found
 
