@@ -1,6 +1,8 @@
 defmodule KrDict.Util.Hangul do
+  alias KrDict.Util.Hangul
   @moduledoc """
   Port of OpenKoreanText - scala twitter
+  # 분리 방법 설명: http://divestudy.tistory.com/8 & https://blog.zective.com/2016/01/21/unicode-%EA%B8%B0%EC%A4%80-%ED%95%9C%EA%B8%80-%ED%98%95%ED%83%9C%EC%86%8C-%EB%B6%84%EB%A6%AC%ED%95%98%EA%B8%B0-%EC%A1%B0%ED%95%A9%ED%95%98%EA%B8%B0/
   """
 
   defstruct [:onset, :vowel, :coda]
@@ -8,15 +10,20 @@ defmodule KrDict.Util.Hangul do
   # This is the first hangul occurrence in utf-8: "가" (last is "뿿", 0xBFFF)
   @hangul_base 0xAC00
 
-  # Todo: understand this and why the multiplication.  Likely UTF-8 beginning of onsets
+  # So to get to the next onset, we have to go through all the vowels
+  # and all the codas.  For for each vowel, 28 codas which takes us from
+  # ㄱ to ㄲ
+  # Therefore we can add 588 to whatever grouping we are in to arrive at the same grouping with a onset
+  # <<first::utf8>> = "가"
+  # "까" = [first + 588] |> List.to_string()
   @onset_base 21 * 28
 
-  # Todo: understand this.  Likely UTF-8 beginning of vowels
+  # After the onset, we can go 28 forward to reach the next vowel
+  # <<first::utf8>> = "가"
+  # "개" = [first + 28] |> List.to_string()
   @vowel_base 28
 
-  # Todo: understand why we don"t care about coda base.  Can we solve some of these issue with pattern matching?
-
-  # onset 감 -> ㄱ
+  # onset 감 -> ㄱ. 19개
   @onset_list [
     "ㄱ",
     "ㄲ",
@@ -39,7 +46,7 @@ defmodule KrDict.Util.Hangul do
     "ㅎ"
   ]
 
-  # vowel = 감 -> ㅏ
+  # vowel = 감 -> ㅏ. 21개
   @vowel_list [
     "ㅏ",
     "ㅐ",
@@ -64,7 +71,7 @@ defmodule KrDict.Util.Hangul do
     "ㅣ"
   ]
 
-  # coda 감 -> ㅁ
+  # coda 감 -> ㅁ.  28개
   @coda_list [
     " ",
     "ㄱ",
@@ -103,16 +110,11 @@ defmodule KrDict.Util.Hangul do
   def decompose(<<hangul::utf8>> = hangul_string) when is_valid_hangul(hangul_string) do
     u = hangul - @hangul_base
 
-    {:ok,
-     %__MODULE__{
-       onset: Enum.fetch!(@onset_list, (u / @onset_base) |> trunc),
-       vowel: Enum.fetch!(@vowel_list, (rem(u, @onset_base) / @vowel_base) |> trunc),
-       coda:
-         case Enum.fetch!(@coda_list, rem(u, @vowel_base)) do
-           " " -> nil
-           other -> other
-         end
-     }}
+    %__MODULE__{}
+    |> add_onset(u)
+    |> add_vowel(u)
+    |> add_coda(u)
+    |>(&{:ok, &1}).()
   end
 
   def decompose(bad_hangul), do: {:error, "#{bad_hangul} is not valid hangul"}
@@ -122,5 +124,28 @@ defmodule KrDict.Util.Hangul do
   end
 
   def compose(%__MODULE__{onset: onset, vowel: vowel, coda: coda}) do
+  end
+
+  defp add_onset(%__MODULE__{} = hangul, u) do
+    onset_index = (u / @onset_base) |> trunc()
+
+    Enum.fetch!(@onset_list, onset_index)
+    |> (&%__MODULE__{hangul | onset: &1}).()
+  end
+
+  defp add_vowel(%__MODULE__{} = hangul, u) do
+    vowel_index = (rem(u, @onset_base) / @vowel_base) |> trunc()
+
+    Enum.fetch!(@vowel_list, vowel_index)
+    |> (&%__MODULE__{hangul | vowel: &1}).()
+  end
+
+  defp add_coda(%__MODULE__{} = hangul, u) do
+    coda_index = rem(u, @vowel_base)
+
+    case Enum.fetch!(@coda_list, coda_index) do
+      " " -> hangul
+      coda -> %__MODULE__{hangul | coda: coda}
+    end
   end
 end
