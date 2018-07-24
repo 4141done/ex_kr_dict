@@ -1,5 +1,6 @@
 defmodule KrDict.Util.Hangul do
   alias KrDict.Util.Hangul
+
   @moduledoc """
   Port of OpenKoreanText - scala twitter
   # 분리 방법 설명: http://divestudy.tistory.com/8 & https://blog.zective.com/2016/01/21/unicode-%EA%B8%B0%EC%A4%80-%ED%95%9C%EA%B8%80-%ED%98%95%ED%83%9C%EC%86%8C-%EB%B6%84%EB%A6%AC%ED%95%98%EA%B8%B0-%EC%A1%B0%ED%95%A9%ED%95%98%EA%B8%B0/
@@ -114,16 +115,43 @@ defmodule KrDict.Util.Hangul do
     |> add_onset(u)
     |> add_vowel(u)
     |> add_coda(u)
-    |>(&{:ok, &1}).()
+    |> (&{:ok, &1}).()
   end
 
   def decompose(bad_hangul), do: {:error, "#{bad_hangul} is not valid hangul"}
 
-  # TODO
   def has_coda?(hangul) do
+    case decompose(hangul) do
+      {:ok, %{coda: nil}} -> false
+      _ -> true
+    end
   end
 
   def compose(%__MODULE__{onset: onset, vowel: vowel, coda: coda}) do
+    @hangul_base
+    |> compose_onset(onset)
+    |> compose_vowel(vowel)
+    |> compose_coda(coda)
+    |> List.wrap()
+    |> List.to_string()
+  end
+
+  defp compose_onset(codepoint, onset) do
+    onset_index = Enum.find_index(@onset_list, fn item -> item == onset end)
+    codepoint + onset_index * @onset_base
+  end
+
+  defp compose_vowel(codepoint, vowel) do
+    vowel_index = Enum.find_index(@vowel_list, fn item -> item == vowel end)
+    codepoint + vowel_index * @vowel_base
+  end
+
+  defp compose_coda(codepoint, nil), do: codepoint
+
+  defp compose_coda(codepoint, coda) do
+    coda_index = Enum.find_index(@coda_list, fn item -> item == coda end)
+
+    codepoint + coda_index
   end
 
   defp add_onset(%__MODULE__{} = hangul, u) do

@@ -69,6 +69,7 @@ defmodule Trie do
     case do_find(root, [], List.to_string(found)) do
       :not_found ->
         {:ok, gather_prefixes(current_node, found, [])}
+
       {:ok, word} ->
         {:ok, gather_prefixes(current_node, found, [word])}
     end
