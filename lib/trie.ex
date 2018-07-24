@@ -53,11 +53,13 @@ defmodule Trie do
     |> Enum.flat_map(fn
       {_, %{is_word_boundary: false, value: val} = next_node} ->
         gather_prefixes(next_node, current ++ [val], found)
+
       {_, %{children: next_children, value: val, is_word_boundary: true} = next_node} ->
         word = List.to_string(current ++ [val])
         gather_prefixes(next_node, current ++ [val], [word | found])
     end)
-    |> Enum.uniq() # Hack: We get the original prefix multiple times
+    # Hack: We get the original prefix multiple times
+    |> Enum.uniq()
     |> Enum.sort()
   end
 
@@ -84,6 +86,7 @@ defmodule Trie do
     case Map.get(children, current) do
       nil ->
         do_find(nil, found, rest)
+
       %{value: val} = next_node ->
         do_find(next_node, found ++ [val], rest)
     end
@@ -99,7 +102,14 @@ defmodule Trie do
           children: %{},
           is_word_boundary: String.length(rest) == 0
         }
-        do_insert(new_node, put_in(root, path ++ [current], new_node), path ++ [current, :children], rest)
+
+        do_insert(
+          new_node,
+          put_in(root, path ++ [current], new_node),
+          path ++ [current, :children],
+          rest
+        )
+
       child ->
         do_insert(child, root, path ++ [current, :children], rest)
     end
