@@ -1,81 +1,81 @@
 defmodule TrieTest do
   use ExUnit.Case
+  require IEx
 
-  setup do
-    trie = start_supervised!(Trie)
-    %{trie: trie}
+  def barf(%TrieNode{children: children}, result \\ []) do
+    children
+    |> Enum.reduce(result, fn {val, next}, acc ->
+      acc ++ barf(next, [val])
+    end)
+    |> Enum.map(&List.to_string([&1]))
   end
 
-  test "insert/2 can insert a word", %{trie: trie} do
-    Trie.insert(trie, "공기")
+  test "insert/2 can insert a word" do
+    trie = Trie.insert("ㄱㅗㅇㄱㅣ")
+    assert barf(trie) == ["ㄱ", "ㅗ", "ㅇ", "ㄱ", "ㅣ"]
   end
 
-  test "insert/2 can insert another word with same initial", %{trie: trie} do
-    Trie.insert(trie, "공기")
-    Trie.insert(trie, "공기밥")
+  test "insert/2 can insert an existing word" do
+    trie =
+      Trie.insert("ㄱㅗㅇㄱㅣ")
+      |> Trie.insert("ㄱㅗㅇㄱㅣ")
+
+    assert barf(trie) == ["ㄱ", "ㅗ", "ㅇ", "ㄱ", "ㅣ"]
   end
 
-  test "insert/2 can insert another word with different initial", %{trie: trie} do
-    Trie.insert(trie, "공기")
-    Trie.insert(trie, "광화문")
+  test "insert/2 handles empty string inserts" do
+    trie = Trie.insert("")
+    assert barf(trie) == []
   end
 
-  test "find/2 can find inserted word", %{trie: trie} do
-    Trie.insert(trie, "공기")
-    Trie.insert(trie, "광화문")
+  test "insert/2 can insert another word with same initial" do
+    trie =
+      Trie.insert("ㄱㅗㅇㄱㅣ")
+      |> Trie.insert("ㄱㅗㅇㄱㅣㅂㅏㅂ")
 
-    assert {:ok, "공기"} == Trie.find(trie, "공기")
+    assert barf(trie) == ["ㄱ", "ㅗ", "ㅇ", "ㄱ", "ㅣ", "ㅂ", "ㅏ", "ㅂ"]
   end
 
-  test "find/2 will not find anything input does not match inserted initial", %{trie: trie} do
-    Trie.insert(trie, "공기")
-    Trie.insert(trie, "광화문")
+  test "insert/2 can insert another word with different initial" do
+    trie =
+      Trie.insert("ㄱㅗㅇㄱㅣ")
+      |> Trie.insert("ㄱㅗㅏㅇㅎㅗㅏㅁㅜㄴ")
 
-    assert :not_found = Trie.find(trie, "고양이")
+    assert barf(trie) == ["ㄱ", "ㅗ", "ㅇ", "ㄱ", "ㅣ", "ㅏ", "ㅇ", "ㅎ", "ㅗ", "ㅏ", "ㅁ", "ㅜ", "ㄴ"]
   end
 
-  test " find/2will not find anything if input matches non-intial syllable", %{trie: trie} do
-    Trie.insert(trie, "공기")
-    Trie.insert(trie, "광화문")
+  test "find/2 can find inserted word" do
+    result =
+      Trie.insert("ㄱㅗㅇㄱㅣ")
+      |> Trie.insert("ㄱㅗㅏㅇㅎㅗㅏㅁㅜㄴ")
+      |> Trie.find("ㄱㅗㅇㄱㅣ")
 
-    assert :not_found = Trie.find(trie, "기")
+    assert result == ["ㄱ", "ㅗ", "ㅇ", "ㄱ", "ㅣ"]
   end
 
-  test "find/2 will not match partial non-words", %{trie: trie} do
-    Trie.insert(trie, "광화문")
-    assert :not_found == Trie.find(trie, "광")
+  test "find/2 will not find anything input does not match inserted initial" do
+    found =
+      Trie.insert("ㄱㅗㅇㄱㅣ")
+      |> Trie.insert("ㄱㅗㅏㅇㅎㅗㅏㅁㅜㄴ")
+      |> Trie.find("ㄱㅗㅇㅑㅇㅇㅣ")
+
+    assert found == nil
   end
 
-  test "prefix/2 deals with empty string", %{trie: trie} do
-    Trie.insert(trie, "공기")
-    Trie.insert(trie, "공기밥")
-    Trie.insert(trie, "공항버스")
+  test " find/2 will not find anything if input matches non-initial syllable" do
+    found =
+      Trie.insert("ㄱㅗㅇㄱㅣ")
+      |> Trie.insert("ㄱㅗㅏㅇㅎㅗㅏㅁㅜㄴ")
+      |> Trie.find("ㄱㅣ")
 
-    assert {:ok, []} = Trie.prefix(trie, "")
+    assert found == nil
   end
 
-  test "prefix/2 find any words that share a prefix", %{trie: trie} do
-    Trie.insert(trie, "공기")
-    Trie.insert(trie, "공기밥")
-    Trie.insert(trie, "공항버스")
+  test "find/2 will not match partial non-words" do
+    found =
+      Trie.insert("ㄱㅗㅏㅇㅎㅗㅏㅁㅜㄴ")
+      |> Trie.find("ㄱㅗㅏㅇ")
 
-    assert {:ok, ["공기", "공기밥", "공항버스"]} = Trie.prefix(trie, "공")
-  end
-
-  test "prefix/2 will return the prefix as well if it is a word", %{trie: trie} do
-    Trie.insert(trie, "공기")
-    Trie.insert(trie, "공기밥")
-    Trie.insert(trie, "공항버스")
-
-    assert {:ok, ["공기", "공기밥"]} = Trie.prefix(trie, "공기")
-  end
-
-  @tag :bad
-  test "prefix/2 will not return the prefix as well if it is not a word", %{trie: trie} do
-    Trie.insert(trie, "공기")
-    Trie.insert(trie, "공기밥")
-    Trie.insert(trie, "공항버스")
-
-    assert {:ok, ["공항버스"]} = Trie.prefix(trie, "공항버")
+    assert found == nil
   end
 end
