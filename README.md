@@ -4,8 +4,13 @@
 
 ## What I was doing last
 Trying to get find to:
-* Match the Map api
-* Work
+* Change the Trie api to match the map api
+* Think about allowing spaces and numbers to exist in words.  Basically it's super fragile to anything that is not hangul
+* Get prefix search working -> rewrite using new find
+* Get dict loader working
+* How to handle adding a meaning
+* Find a good dictionary
+
 
 Next order of bizness is to implement prefix search
 
