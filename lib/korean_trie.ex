@@ -33,26 +33,26 @@ defmodule KoreanTrie do
     {:reply, do_prefix_search(state, binary, [], state), state}
   end
 
+  def handle_call(:barf, _from, state) do
+    {:reply, state, state}
+  end
+
   def handle_cast({:insert, binary}, state) do
     new_state = do_insert(state, state, [:children], binary)
     {:noreply, new_state}
-  end
-
-  def handle_call(:barf, _from, state) do
-    {:reply, state, state}
   end
 
   def gather_prefixes(%{children: children}, _current, found) when children == %{} do
     found
   end
 
-  def gather_prefixes(%{value: val, children: children} = current_node, current, found) do
+  def gather_prefixes(%{value: _val, children: children}, current, found) do
     children
     |> Enum.flat_map(fn
       {_, %{is_word_boundary: false, value: val} = next_node} ->
         gather_prefixes(next_node, current ++ [val], found)
 
-      {_, %{children: next_children, value: val, is_word_boundary: true} = next_node} ->
+      {_, %{is_word_boundary: true, value: val} = next_node} ->
         word = List.to_string(current ++ [val])
         gather_prefixes(next_node, current ++ [val], [word | found])
     end)
@@ -61,7 +61,7 @@ defmodule KoreanTrie do
     |> Enum.sort()
   end
 
-  def gather_prefixes(_node, _current, found), do: []
+  def gather_prefixes(_node, _current, _found), do: []
 
   defp do_prefix_search(nil, _, _, _), do: {:ok, []}
 
@@ -88,7 +88,7 @@ defmodule KoreanTrie do
 
   defp do_find(nil, _, _), do: :not_found
 
-  defp do_find(%{children: children} = current_node, found, <<current::utf8>> <> rest) do
+  defp do_find(%{children: children}, found, <<current::utf8>> <> rest) do
     case Map.get(children, current) do
       nil ->
         do_find(nil, found, rest)
@@ -100,7 +100,7 @@ defmodule KoreanTrie do
 
   defp do_insert(_current_node, root, _path, ""), do: root
 
-  defp do_insert(%{children: children} = current_node, root, path, <<current::utf8>> <> rest) do
+  defp do_insert(%{children: children}, root, path, <<current::utf8>> <> rest) do
     case Map.get(children, current) do
       nil ->
         new_node = %{
