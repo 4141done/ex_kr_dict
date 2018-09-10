@@ -7,7 +7,7 @@ defmodule Trie do
     insert(current_node, [], current_node, to_insert)
   end
 
-  def insert(_current_node, path, root, "") do
+  def insert(_current_node, _path, root, "") do
     root
   end
 
@@ -41,7 +41,7 @@ defmodule Trie do
     |> Enum.map(&List.to_string([&1]))
   end
 
-  def find(t, _found, "") do
+  def find(_t, _found, "") do
     nil
   end
 

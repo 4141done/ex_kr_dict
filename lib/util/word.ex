@@ -39,7 +39,7 @@ defmodule KrDict.Util.Word do
         [onset, vowel]
       {:ok, %KrDict.Util.Hangul{onset: onset, vowel: vowel, coda: coda}} ->
         [onset, vowel, coda]
-      {:error, message} ->
+      {:error, _message} ->
         [:error]
     end)
 

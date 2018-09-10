@@ -1,5 +1,4 @@
 defmodule KrDict.Util.Hangul do
-  alias KrDict.Util.Hangul
 
   @moduledoc """
   Port of OpenKoreanText - scala twitter

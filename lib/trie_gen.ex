@@ -40,7 +40,7 @@ defmodule TrieGen do
   ############
   # Internal #
   ############
-  defp do_insert(_current_node, path, root, "") do
+  defp do_insert(_current_node, _path, root, "") do
     root
   end
 
