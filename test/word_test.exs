@@ -1,6 +1,6 @@
 defmodule WordTest do
   use ExUnit.Case
-  alias KrDict.Util.{Word}
+  alias KrDict.Util.Word
 
   test "from_hangul_array/1 can assemble a good two character syllable" do
     assert Word.from_hangul_array(["ㄱ", "ㅏ"]) == {:ok, "가"}

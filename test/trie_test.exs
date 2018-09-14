@@ -154,7 +154,6 @@ defmodule TrieTest do
       Trie.insert("ㄱㅗㅏㅇㅎㅗㅏㅁㅜㄴ")
       |> Trie.insert("ㄱㅗㅏㅇ")
       |> Trie.find("ㅂㅏㄱ", include_node: true)
-    <<expected_value::utf8>> = "ㅇ"
     assert {nil, nil} == found
   end
 
