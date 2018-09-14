@@ -1,15 +1,15 @@
 # KrDict
 
-**TODO: Add description**
+Currently this is kind of a playground to experiment with tools for working with Korean in Elixir.
 
-## What I was doing last
-Trying to get find to:
-* Match the Map api
-* Work
+## Todo
+* Make the prefix search more efficient by passing the current place in the node and modifying the query
+* Measure individual "letters" vs syllables as the base element of the trie (syllables seem much better)
+* How to handle adding a meaning
+* Add search frequency to the trie
+* Find a good dictionary
+* Start playing with sample texts
 
-Next order of bizness is to implement prefix search
-
-Next is to get this all connected with the hangul decomposer and recomposer
 
 ## Installation
 

@@ -13,7 +13,8 @@ defmodule KrDict.Util.Hangul do
   # So to get to the next onset, we have to go through all the vowels
   # and all the codas.  For for each vowel, 28 codas which takes us from
   # ㄱ to ㄲ
-  # Therefore we can add 588 to whatever grouping we are in to arrive at the same grouping with a onset
+  # Therefore we can add 588 to whatever grouping we are in
+  # to arrive at the same grouping with a onset
   # <<first::utf8>> = "가"
   # "까" = [first + 588] |> List.to_string()
   @onset_base 21 * 28

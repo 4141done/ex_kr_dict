@@ -39,7 +39,8 @@ defmodule WordTest do
   end
 
   test "to_hangul_array/1 converts properly" do
-    assert Word.to_hangul_array("공항버스") == {:ok, ["ㄱ", "ㅗ", "ㅇ", "ㅎ", "ㅏ", "ㅇ", "ㅂ", "ㅓ", "ㅅ", "ㅡ"]}
+    assert Word.to_hangul_array("공항버스") ==
+             {:ok, ["ㄱ", "ㅗ", "ㅇ", "ㅎ", "ㅏ", "ㅇ", "ㅂ", "ㅓ", "ㅅ", "ㅡ"]}
   end
 
   test "to_hangul_array/1 gives an error if " do

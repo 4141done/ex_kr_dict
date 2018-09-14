@@ -48,5 +48,4 @@ defmodule KrDict.Util.Word do
       _other -> {:error, "bad hangul"}
     end
   end
-
 end
