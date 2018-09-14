@@ -79,7 +79,7 @@ defmodule KrDict.Trie do
   def find(%TrieNode{children: children} = current_node, found, <<char::utf8>> <> rest, opts) do
     case Map.get(children, char) do
       nil ->
-        build_find_result(current_node, nil, opts)
+        build_find_result(nil, nil, opts)
 
       next_node ->
         find(%{next_node | prev: current_node}, [char | found], rest, opts)
@@ -123,19 +123,32 @@ defmodule KrDict.Trie do
 
   def prefix(trie, query) do
     case find(trie, query, include_node: true) do
+      {nil, nil} ->
+        []
+
+      _ ->
+        do_prefix_lookup(trie, query)
+    end
+  end
+
+  def do_prefix_lookup(trie, query) do
+    case find(trie, query, include_node: true) do
+      {%TrieNode{children: children}, nil} when children == %{} ->
+        []
+
       {%TrieNode{children: children}, _match} when children == %{} ->
         [query]
 
       {%TrieNode{children: children}, nil} ->
         children
-        |> Enum.flat_map(fn {val, node} ->
-          prefix(node, query <> <<val::utf8>>)
+        |> Enum.flat_map(fn {val, _node} ->
+          do_prefix_lookup(trie, query <> <<val::utf8>>)
         end)
 
       {%TrieNode{children: children}, match} ->
         children
         |> Enum.flat_map(fn {val, _node} ->
-          [match] ++ prefix(trie, match <> <<val::utf8>>)
+          [match] ++ do_prefix_lookup(trie, match <> <<val::utf8>>)
         end)
     end
   end

@@ -148,6 +148,26 @@ defmodule TrieTest do
     assert {%TrieNode{value: ^expected_value}, "ㄱㅗㅏㅇ"} = found
   end
 
+  @tag :trie_find
+  test "find/3 will return nil for the node if `include_node` option passed and the query does not exist in the trie" do
+    found =
+      Trie.insert("ㄱㅗㅏㅇㅎㅗㅏㅁㅜㄴ")
+      |> Trie.insert("ㄱㅗㅏㅇ")
+      |> Trie.find("ㅂㅏㄱ", include_node: true)
+    <<expected_value::utf8>> = "ㅇ"
+    assert {nil, nil} == found
+  end
+
+  @tag :trie_find
+  test "find/3 will return the current node if `include_node` option passed and the query is not a word" do
+    found =
+      Trie.insert("ㄱㅗㅏㅇㅎㅗㅏㅁㅜㄴ")
+      |> Trie.insert("ㄱㅗㅏㅇ")
+      |> Trie.find("ㄱㅗㅏ", include_node: true)
+    <<expected_value::utf8>> = "ㅏ"
+    assert {%TrieNode{value: ^expected_value}, nil} = found
+  end
+
   @tag :trie_prefix
   test "prefix/3 deals with empty string" do
     found =
@@ -197,5 +217,15 @@ defmodule TrieTest do
     |> Trie.prefix("공항버")
 
     assert found == ["공항버스"]
+  end
+
+  @tag :trie_prefix
+  test "prefix/3 will not return anything if there are no matching prefixes" do
+   found = Trie.insert("공기")
+    |> Trie.insert("공기밥")
+    |> Trie.insert("공항버스")
+    |> Trie.prefix("물")
+
+    assert found == []
   end
 end
