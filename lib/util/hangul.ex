@@ -1,5 +1,4 @@
 defmodule KrDict.Util.Hangul do
-
   @moduledoc """
   Port of OpenKoreanText - scala twitter
   # 분리 방법 설명: http://divestudy.tistory.com/8 & https://blog.zective.com/2016/01/21/unicode-%EA%B8%B0%EC%A4%80-%ED%95%9C%EA%B8%80-%ED%98%95%ED%83%9C%EC%86%8C-%EB%B6%84%EB%A6%AC%ED%95%98%EA%B8%B0-%EC%A1%B0%ED%95%A9%ED%95%98%EA%B8%B0/
