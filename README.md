@@ -2,6 +2,8 @@
 
 Currently this is kind of a playground to experiment with tools for working with Korean in Elixir.
 
+This project borrows liberally from [open-korean-text](https://github.com/open-korean-text/open-korean-text). In some cases there is some directly ported code (`KrDict.Util.Hangul`).
+
 ## Todo
 * Make the prefix search more efficient by passing the current place in the node and modifying the query
 * Measure individual "letters" vs syllables as the base element of the trie (syllables seem much better)
