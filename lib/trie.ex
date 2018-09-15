@@ -150,8 +150,9 @@ defmodule KrDict.Trie do
       {%TrieNode{children: children}, match} ->
         children
         |> Enum.flat_map(fn {val, _node} ->
-          [match] ++ do_prefix_lookup(trie, match <> <<val::utf8>>)
+          do_prefix_lookup(trie, match <> <<val::utf8>>)
         end)
+        |> List.insert_at(0, match)
     end
   end
 end

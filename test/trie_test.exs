@@ -239,8 +239,8 @@ defmodule TrieTest do
     assert found == []
   end
 
-  @tag :regression
-  test "prefix/3 replicate error" do
+  @tag :trie_prefix
+  test "prefix/2 when subsequent nodes have many other nodes" do
     found = Trie.insert("공")
       |> Trie.insert("공항")
       |> Trie.insert("공부")
