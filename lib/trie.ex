@@ -1,5 +1,6 @@
 defmodule KrDict.Trie do
   alias KrDict.TrieNode
+
   @moduledoc """
   A general purpose autocomplete/lookup trie
   """
@@ -86,12 +87,13 @@ defmodule KrDict.Trie do
     end
   end
 
-  defp build_find_result(node, nil, [include_node: true]), do: {node, nil}
+  defp build_find_result(node, nil, include_node: true), do: {node, nil}
 
   defp build_find_result(_node, nil, _opts), do: nil
 
   defp build_find_result(node, result, opts) do
-    found = result
+    found =
+      result
       |> Enum.reverse()
       |> Enum.map(&List.to_string([&1]))
       |> Enum.join()

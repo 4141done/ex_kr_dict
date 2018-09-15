@@ -16,7 +16,7 @@ defmodule KrDict.Util.Dict do
               Trie.insert(acc, to_insert)
 
             {:error, error} ->
-              IO.puts("Errored on #{word}: #{inspect error}")
+              IO.puts("Errored on #{word}: #{inspect(error)}")
               acc
           end
 

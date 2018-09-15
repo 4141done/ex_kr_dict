@@ -51,8 +51,9 @@ defmodule TrieTest do
 
   @tag :trie_insert
   test "insert/2 marks the last node in the inserted word with is_word: true" do
-    trie = Trie.insert("ㄹ")
-    |> Trie.insert("ㄱㅗ")
+    trie =
+      Trie.insert("ㄹ")
+      |> Trie.insert("ㄱㅗ")
 
     <<expected_first_value::utf8>> = "ㄹ"
 
@@ -60,43 +61,44 @@ defmodule TrieTest do
     <<expected_second_value::utf8>> = "ㅗ"
 
     assert [
-      %{
-        is_word: true,
-        value: ^expected_first_value
-      },
-      %{
-        is_word: false,
-        value: ^expected_intermediate_value,
-        children: %{
-          ^expected_second_value => %{
-            value: ^expected_second_value,
-            is_word: true
-          }
-        }
-      }
-    ] = Map.values(trie.children) |> Enum.sort(&(&1.value >= &2.value))
+             %{
+               is_word: true,
+               value: ^expected_first_value
+             },
+             %{
+               is_word: false,
+               value: ^expected_intermediate_value,
+               children: %{
+                 ^expected_second_value => %{
+                   value: ^expected_second_value,
+                   is_word: true
+                 }
+               }
+             }
+           ] = Map.values(trie.children) |> Enum.sort(&(&1.value >= &2.value))
   end
 
   @tag :trie_insert
   test "insert/2 marks the last node in the inserted word with is_word: true and node already exists" do
-    trie = Trie.insert("ㄱㅗ")
-    |> Trie.insert("ㄱ")
+    trie =
+      Trie.insert("ㄱㅗ")
+      |> Trie.insert("ㄱ")
 
     <<expected_first_value::utf8>> = "ㄱ"
     <<expected_second_value::utf8>> = "ㅗ"
 
     assert [
-      %{
-        is_word: true,
-        value: ^expected_first_value,
-        children: %{
-          ^expected_second_value => %{
-            is_word: true,
-            value: ^expected_second_value
-          }
-        }
-      },
-    ] = Map.values(trie.children) |> Enum.sort(&(&1.value >= &2.value))
+             %{
+               is_word: true,
+               value: ^expected_first_value,
+               children: %{
+                 ^expected_second_value => %{
+                   is_word: true,
+                   value: ^expected_second_value
+                 }
+               }
+             }
+           ] = Map.values(trie.children) |> Enum.sort(&(&1.value >= &2.value))
   end
 
   @tag :trie_find
@@ -144,6 +146,7 @@ defmodule TrieTest do
       Trie.insert("ㄱㅗㅏㅇㅎㅗㅏㅁㅜㄴ")
       |> Trie.insert("ㄱㅗㅏㅇ")
       |> Trie.find("ㄱㅗㅏㅇ", include_node: true)
+
     <<expected_value::utf8>> = "ㅇ"
     assert {%TrieNode{value: ^expected_value}, "ㄱㅗㅏㅇ"} = found
   end
@@ -154,6 +157,7 @@ defmodule TrieTest do
       Trie.insert("ㄱㅗㅏㅇㅎㅗㅏㅁㅜㄴ")
       |> Trie.insert("ㄱㅗㅏㅇ")
       |> Trie.find("ㅂㅏㄱ", include_node: true)
+
     assert {nil, nil} == found
   end
 
@@ -163,6 +167,7 @@ defmodule TrieTest do
       Trie.insert("ㄱㅗㅏㅇㅎㅗㅏㅁㅜㄴ")
       |> Trie.insert("ㄱㅗㅏㅇ")
       |> Trie.find("ㄱㅗㅏ", include_node: true)
+
     <<expected_value::utf8>> = "ㅏ"
     assert {%TrieNode{value: ^expected_value}, nil} = found
   end
@@ -180,16 +185,19 @@ defmodule TrieTest do
 
   @tag :trie_prefix
   test "prefix/3 find a word if only one word that shares the prefix" do
-    found = Trie.insert("공")
+    found =
+      Trie.insert("공")
       |> Trie.insert("밥")
       |> Trie.insert("판다")
       |> Trie.prefix("공")
+
     assert found == ["공"]
   end
 
   @tag :trie_prefix
   test "prefix/3 find any words that share a prefix" do
-    found = Trie.insert("공")
+    found =
+      Trie.insert("공")
       |> Trie.insert("밥")
       |> Trie.insert("공기밥")
       |> Trie.insert("공기")
@@ -200,30 +208,33 @@ defmodule TrieTest do
 
   @tag :trie_prefix
   test "prefix/3 will return the prefix as well if it is a word" do
-    found = Trie.insert("공기")
-    |> Trie.insert("공기밥")
-    |> Trie.insert("공항버스")
-    |> Trie.prefix("공기")
+    found =
+      Trie.insert("공기")
+      |> Trie.insert("공기밥")
+      |> Trie.insert("공항버스")
+      |> Trie.prefix("공기")
 
     assert found == ["공기", "공기밥"]
   end
 
   @tag :trie_prefix
   test "prefix/3 will not return the prefix as well if it is not a word" do
-   found = Trie.insert("공기")
-    |> Trie.insert("공기밥")
-    |> Trie.insert("공항버스")
-    |> Trie.prefix("공항버")
+    found =
+      Trie.insert("공기")
+      |> Trie.insert("공기밥")
+      |> Trie.insert("공항버스")
+      |> Trie.prefix("공항버")
 
     assert found == ["공항버스"]
   end
 
   @tag :trie_prefix
   test "prefix/3 will not return anything if there are no matching prefixes" do
-   found = Trie.insert("공기")
-    |> Trie.insert("공기밥")
-    |> Trie.insert("공항버스")
-    |> Trie.prefix("물")
+    found =
+      Trie.insert("공기")
+      |> Trie.insert("공기밥")
+      |> Trie.insert("공항버스")
+      |> Trie.prefix("물")
 
     assert found == []
   end
