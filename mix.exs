@@ -22,7 +22,8 @@ defmodule KrDict.MixProject do
   defp deps do
     [
       {:mix_test_watch, "~> 0.6.0", only: :dev, runtime: false},
-      {:csv, "~> 2.0.0"}
+      {:csv, "~> 2.0.0"},
+      {:benchwarmer, "~> 0.0.2"}
     ]
   end
 end
