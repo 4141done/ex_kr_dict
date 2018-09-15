@@ -6,7 +6,6 @@ This project borrows liberally from [open-korean-text](https://github.com/open-k
 
 ## Todo
 * Make the prefix search more efficient by passing the current place in the node and modifying the query
-* Measure individual "letters" vs syllables as the base element of the trie (syllables seem much better)
 * How to handle adding a meaning
 * Add search frequency to the trie
 * Find a good dictionary
