@@ -173,7 +173,7 @@ defmodule TrieTest do
   end
 
   @tag :trie_prefix
-  test "prefix/3 deals with empty string" do
+  test "prefix/2 deals with empty string" do
     found =
       Trie.insert("ㄱㅗㅇㄱㅣ")
       |> Trie.insert("ㄱㅗㅇㄱㅣㅂㅏㅂ")
@@ -184,7 +184,7 @@ defmodule TrieTest do
   end
 
   @tag :trie_prefix
-  test "prefix/3 find a word if only one word that shares the prefix" do
+  test "prefix/2 find a word if only one word that shares the prefix" do
     found =
       Trie.insert("공")
       |> Trie.insert("밥")
@@ -195,7 +195,7 @@ defmodule TrieTest do
   end
 
   @tag :trie_prefix
-  test "prefix/3 find any words that share a prefix" do
+  test "prefix/2 find any words that share a prefix" do
     found =
       Trie.insert("공")
       |> Trie.insert("밥")
@@ -207,7 +207,7 @@ defmodule TrieTest do
   end
 
   @tag :trie_prefix
-  test "prefix/3 will return the prefix as well if it is a word" do
+  test "prefix/2 will return the prefix as well if it is a word" do
     found =
       Trie.insert("공기")
       |> Trie.insert("공기밥")
@@ -218,7 +218,7 @@ defmodule TrieTest do
   end
 
   @tag :trie_prefix
-  test "prefix/3 will not return the prefix as well if it is not a word" do
+  test "prefix/2 will not return the prefix as well if it is not a word" do
     found =
       Trie.insert("공기")
       |> Trie.insert("공기밥")
@@ -229,7 +229,7 @@ defmodule TrieTest do
   end
 
   @tag :trie_prefix
-  test "prefix/3 will not return anything if there are no matching prefixes" do
+  test "prefix/2 will not return anything if there are no matching prefixes" do
     found =
       Trie.insert("공기")
       |> Trie.insert("공기밥")
@@ -237,5 +237,18 @@ defmodule TrieTest do
       |> Trie.prefix("물")
 
     assert found == []
+  end
+
+  @tag :regression
+  test "prefix/3 replicate error" do
+    found = Trie.insert("공")
+      |> Trie.insert("공항")
+      |> Trie.insert("공부")
+      |> Trie.insert("공항버스")
+      |> Trie.insert("방귀")
+      |> Trie.insert("진우")
+      |> Trie.prefix("공")
+
+    assert found == ["공", "공부", "공항", "공항버스"]
   end
 end
