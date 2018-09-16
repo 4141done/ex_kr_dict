@@ -9,7 +9,25 @@ This project borrows liberally from [open-korean-text](https://github.com/open-k
 * How to handle adding a meaning
 * Add search frequency to the trie
 * Find a good dictionary
-* Start playing with sample texts
+* Create struct structure for a sentence that holds "segments" as they are expanded by processing and splitting.  This would likely be a map of arbitrarilty assigned keys to "segments", then a list of keys to show order
+
+
+## Stemming notes
+* By doing basic strategy of removing syllables from the end and then performing a prefix search reliably performs at about 50% accuracy depending on the text
+* This strategy is highly susceptible to how
+  1. Complete
+  2. Tailored
+  The dictionary is.
+
+* Next strategies to try:
+  1. Find a really good dictionary
+  2. Try stemming by deconstructing instead of syllable by syllable
+  3. Create additional pipelines for words not found in dictionary
+  4. Smarter strategies for choosing matches
+    * Can't be longer than original word? (might have some issues there)
+    * Can't have too large a difference in length?
+    * Partial POS tagging to know whether we prefer 다 at the end since we think it's a verb
+  5. What are the mechanisms to help this thing learn as we use it. (Manual submission?)
 
 
 ## Installation

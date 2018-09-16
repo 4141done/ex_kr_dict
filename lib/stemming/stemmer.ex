@@ -1,8 +1,8 @@
-defmodule KrDict.Util.Sentence do
+defmodule KrDict.Stemming.Sentence do
   defstruct [words: [], total_length: 0]
 end
 
-defmodule KrDict.Util.SentenceWord do
+defmodule KrDict.Stemming.SentenceWord do
   defstruct [:original_form, :stem, :position]
 
   def build(original_form, position) do
@@ -10,15 +10,9 @@ defmodule KrDict.Util.SentenceWord do
   end
 end
 
-defmodule KrDict.Util.Stemmer do
-  alias KrDict.Util.{Sentence, SentenceWord}
+defmodule KrDict.Stemming.Stemmer do
+  alias KrDict.Stemming.{Sentence, SentenceWord}
   alias KrDict.{Trie, TrieNode}
-  # Maybe filter out super common things
-  # find on all words
-  # words that do not return a find run prefix with last thing removed
-  # continue stemming until we get at least one prefix
-
-  @test "지의류는 바위나 나무껍질에 넓게 분포하는 녹조식물 종류 중 하나입니다"
 
   def naive_dictionary(word) do
     IO.puts "--> #{inspect word}"
@@ -41,9 +35,9 @@ defmodule KrDict.Util.Stemmer do
     |> naive_dictionary(search_segment, original)
   end
 
-  def naive_dictionary([match | rest], word, original) do
-    segment_size = byte_size(word)
-    <<_::bytes-size(segment_size), removed_segment::binary>> = word
+  def naive_dictionary([match | rest], substring, original) do
+    segment_size = byte_size(substring)
+    <<_::bytes-size(segment_size), removed_segment::binary>> = original
 
     {match, original}
   end
