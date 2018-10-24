@@ -5,6 +5,8 @@ Currently this is kind of a playground to experiment with tools for working with
 This project borrows liberally from [open-korean-text](https://github.com/open-korean-text/open-korean-text). In some cases there is some directly ported code (`KrDict.Util.Hangul`).
 
 ## Todo
+* https://en.wikipedia.org/wiki/Suffix_array
+* https://en.wikipedia.org/wiki/Burrows%E2%80%93Wheeler_transform
 * Make the prefix search more efficient by passing the current place in the node and modifying the query
 * How to handle adding a meaning
 * Add search frequency to the trie
