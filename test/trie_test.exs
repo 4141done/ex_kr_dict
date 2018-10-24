@@ -241,7 +241,8 @@ defmodule TrieTest do
 
   @tag :trie_prefix
   test "prefix/2 when subsequent nodes have many other nodes" do
-    found = Trie.insert("공")
+    found =
+      Trie.insert("공")
       |> Trie.insert("공항")
       |> Trie.insert("공부")
       |> Trie.insert("공항버스")

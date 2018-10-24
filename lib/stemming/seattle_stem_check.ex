@@ -21,7 +21,8 @@ defmodule KrDict.Stemming.SeattleStemCheck do
     {"지역", "지역의"},
     {"자연", "자연"},
     {"자원", "자원들을"},
-    {"위하다", "휘한"}, #??
+    # ??
+    {"위하다", "휘한"},
     {"국내적", "국내적"},
     {"시장", "시장들을"},
     {"열다", "열었다."},
@@ -53,19 +54,22 @@ defmodule KrDict.Stemming.SeattleStemCheck do
   alias KrDict.Stemming.Stemmer
 
   def check do
-    stemmed = @test_text
-    |> String.split(" ")
-    |> Enum.map(&Stemmer.naive_dictionary/1)
+    stemmed =
+      @test_text
+      |> String.split(" ")
+      |> Enum.map(&Stemmer.naive_dictionary/1)
 
-    results = stemmed
-    |> Enum.reduce({0, []}, fn stem_result, {error_count, errored} ->
-      case Enum.member?(@expected, stem_result) do
-        false ->
-          {error_count + 1, [stem_result | errored]}
-        _ ->
-          {error_count, errored}
-      end
-    end)
+    results =
+      stemmed
+      |> Enum.reduce({0, []}, fn stem_result, {error_count, errored} ->
+        case Enum.member?(@expected, stem_result) do
+          false ->
+            {error_count + 1, [stem_result | errored]}
+
+          _ ->
+            {error_count, errored}
+        end
+      end)
 
     %{
       stem_results: stemmed,

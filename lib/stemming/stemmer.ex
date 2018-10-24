@@ -1,5 +1,5 @@
 defmodule KrDict.Stemming.Sentence do
-  defstruct [words: [], total_length: 0]
+  defstruct words: [], total_length: 0
 end
 
 defmodule KrDict.Stemming.SentenceWord do
@@ -15,7 +15,7 @@ defmodule KrDict.Stemming.Stemmer do
   alias KrDict.{Trie, TrieNode}
 
   def naive_dictionary(word) do
-    IO.puts "--> #{inspect word}"
+    IO.puts("--> #{inspect(word)}")
     naive_dictionary(MyDict.prefix(word), word, word)
   end
 
@@ -24,9 +24,10 @@ defmodule KrDict.Stemming.Stemmer do
   end
 
   def naive_dictionary([], word, original) do
-    [removed | rest] = String.graphemes(word) |> Enum.reverse
+    [removed | rest] = String.graphemes(word) |> Enum.reverse()
 
-    search_segment = rest
+    search_segment =
+      rest
       |> Enum.reverse()
       |> Enum.join("")
 
@@ -51,8 +52,11 @@ defmodule KrDict.Stemming.Stemmer do
       {idx + 1, %{acc | words: [SentenceWord.build(word, idx) | acc.words]}}
     end)
     |> (fn {sentence_length, built_sentence} ->
-      %{built_sentence | total_length: sentence_length, words: built_sentence.words |> Enum.reverse() }
-    end).()
+          %{
+            built_sentence
+            | total_length: sentence_length,
+              words: built_sentence.words |> Enum.reverse()
+          }
+        end).()
   end
-
 end

@@ -18,7 +18,6 @@ defmodule KrDict.Util.Dict do
     File.stream!(file_path)
     |> CSV.decode!(separator: ?\t)
     |> Enum.reduce(%TrieNode{}, fn [_, word | _rest], acc ->
-
       case word =~ ~r/\s|\d|[.,\/#!$%\^&\*;:{}=\-_`~()\?'"<>]|[a-zA-Z]/ do
         false ->
           case Word.to_hangul_array(word) do
