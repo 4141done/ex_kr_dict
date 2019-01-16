@@ -7,6 +7,7 @@ This project borrows liberally from [open-korean-text](https://github.com/open-k
 ## Todo
 * https://en.wikipedia.org/wiki/Suffix_array
 * https://en.wikipedia.org/wiki/Burrows%E2%80%93Wheeler_transform
+* https://en.wikipedia.org/wiki/FM-index
 * Make the prefix search more efficient by passing the current place in the node and modifying the query
 * How to handle adding a meaning
 * Add search frequency to the trie
