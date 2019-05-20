@@ -20,7 +20,7 @@ This project borrows liberally from [open-korean-text](https://github.com/open-k
 * This strategy is highly susceptible to how
   1. Complete
   2. Tailored
-  The dictionary is.
+  The dictionary is.  I have not been able to find a very complete word list including a good number of foreign loan words.
 
 * Next strategies to try:
   1. Find a really good dictionary
